@@ -3,8 +3,9 @@ import {enableProdMode} from '@angular/core';
 import { IonicPage } from 'ionic-angular';
 import { NavController, Platform, LoadingController, ToastController } from 'ionic-angular';
 import { google } from 'google-maps';
-import { Geolocation ,GeolocationOptions ,Geoposition ,PositionError } from '@ionic-native/geolocation;
+// import { Geolocation ,GeolocationOptions ,Geoposition ,PositionError } from '@ionic-native/geolocation;
 // import { Geolocation } from '@ionic-native/geolocation/';
+// import { Geolocation } from 'ionic-native';
 import {
   GoogleMaps,
   GoogleMap,
@@ -32,6 +33,8 @@ export class HomePage implements OnInit {
   directionsService = new google.maps.DirectionsService;
   directionsDisplay = new google.maps.DirectionsRenderer;
   private points = new Array();
+  // private devLat;
+  // private devLng;
   
   // points = [
   //   {lat: 85,lng: 90},  
@@ -70,19 +73,22 @@ export class HomePage implements OnInit {
     let mapOptions: GoogleMapOptions = {
       camera: {
          target: {
-           lat: 43.0741904,
-           lng: -89.3809802
+           lat: 47.241021404,
+           lng: -122.498184045
          },
-         zoom: 10,
+         zoom: 8,
          tilt: 0,
        },
       disableDoubleClickZoom: true,
       draggable: false,
       scrollwheel: false,
-      panControl: false
+      panControl: false,
+      controls: {
+        myLocationButton: true
+      }
     };
 
-    this.map = GoogleMaps.create('map', {});
+    this.map = GoogleMaps.create('map', mapOptions);
 
     // this.geolocation.getCurrentPosition().then(pos => {
     //   let latLng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
@@ -114,10 +120,20 @@ export class HomePage implements OnInit {
       }
     );
 
+ 
+
     // Geolocation.getCurrentPosition().then((resp) => {
 
-    //   this.myLat = resp.coords.latitude;
-    //   this.myLong = resp.coords.longitude;
+    //   this.devLat = resp.coords.latitude;
+    //   this.devLng = resp.coords.longitude;
+    //   var myLatLng = {lat: this.devLat, lng: this.devLng};
+
+    //   let marker: Marker = this.map.addMarkerSync({
+    //     title: 'me',
+    //     snippet: 'This plugin is awesome!',
+    //     position: myLatLng
+       
+    //   });
    
     //  }).catch((error) => {
     //    console.log('Error getting location', error);
