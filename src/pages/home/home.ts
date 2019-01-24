@@ -20,7 +20,7 @@ import {
 declare var google;
 const CAMERA_DEFAULT_LAT = 47.497912;
 const CAMERA_DEFAULT_LONG = 19.040235;
-const CAMERA_DEFAULT_ZOOMLEVEL = 13;
+const CAMERA_DEFAULT_ZOOMLEVEL = 8;
 
 
 @IonicPage()
@@ -105,41 +105,24 @@ export class HomePage implements OnInit {
         zoom: true
       },
       gestures: {
-        scroll: false,
+        scroll: true,
         tilt: false,
         rotate: false,
         zoom: true
       },
       camera: {
         target: {
-            lat: 47.0741904,
-           lng: -89.3809802
+            lat: 47.2529,
+           lng: -122.4443
         },
         zoom: CAMERA_DEFAULT_ZOOMLEVEL
       },
       preferences: {
-        // zoom: {
-        //   minZoom: 10,
-        //   maxZoom: 18
-        // },
         building: true
       }
     };
 
-
-
-
     this.map = GoogleMaps.create('map', mapOptions);
-
-    // this.geolocation.getCurrentPosition().then(pos => {
-    //   let latLng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-    //   this.map.setMyLocationEnabled(true);
-    //   this.map.setCameraTarget(latLng);
-    //   this.map.setCameraZoom(16);
-    // }).catch((error) => {
-    //   console.log('Error getting location', error);
-    // });
-  
 
     this.map.on(GoogleMapsEvent.MAP_CLICK).subscribe(
       (data) => {
@@ -153,34 +136,11 @@ export class HomePage implements OnInit {
             animation: GoogleMapsAnimation.BOUNCE
           });
         
-       
-
           console.log("finding data lat", data[0].lat);
           console.log("finding data lng", data[0].lng);
        
       }
     );
-
- 
-
-    // Geolocation.getCurrentPosition().then((resp) => {
-
-    //   this.devLat = resp.coords.latitude;
-    //   this.devLng = resp.coords.longitude;
-    //   var myLatLng = {lat: this.devLat, lng: this.devLng};
-
-    //   let marker: Marker = this.map.addMarkerSync({
-    //     title: 'me',
-    //     snippet: 'This plugin is awesome!',
-    //     position: myLatLng
-       
-    //   });
-   
-    //  }).catch((error) => {
-    //    console.log('Error getting location', error);
-    //  });
-
-
   }
 
   addPolly(){
@@ -201,23 +161,6 @@ export class HomePage implements OnInit {
     // this.map.of
   }
   
-  // calculateAndDisplayRoute() {
-  //   this.directionsService.route({
-  //     origin: this.start,
-  //     destination: this.end,
-  //     travelMode: 'DRIVING'
-  //   }, (response, status) => {
-  //     if (status === 'OK') {
-  //       this.directionsDisplay.setDirections(response);
-  //     } else {
-  //       window.alert('Directions request failed due to ' + status);
-  //     }
-  //   });
-  // }
-
-  // addMarker(marker: Marker){
-  //   console.log("latLong  add marker", marker.getPosition());  
-  // }
 
   addInfoWindow(marker, content){
  
