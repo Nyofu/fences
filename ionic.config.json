@@ -1,0 +1,7 @@
+{
+  "name": "fences",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "ionic-angular"
+}
