@@ -6,6 +6,7 @@
     <ion-buttons end>
       <button ion-button (click)="addPolly()">Add Polly</button>
       <button ion-button (click)="clearMap()">Clear</button>
+      <button ion-button (click)="track()">Track</button>
     </ion-buttons> 
   </ion-navbar>
 </ion-header>
@@ -45,7 +46,9 @@
     </div> -->
     <!-- <div data-tap-disabled="true"> -->
     <div  data-tap-disabled="true" #map id="map">
-      <!-- <ion-fab bottom right><button color="light" ion-fab (click)="somefunction()"><ion-icon ios="ios-locate-outline" md="md-locate"></ion-icon></button></ion-fab> -->
+      <!-- <ion-fab bottom center><button color="light" ion-fab  (click)="holdMap()">hold</button></ion-fab> -->
+    
     </div>
+      <!-- <ion-button (click)="holdMap()">hold</ion-button> -->
   <!-- </div> -->
 </ion-content>

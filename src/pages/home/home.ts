@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
-import {enableProdMode} from '@angular/core';
+import { enableProdMode } from '@angular/core';
 import { IonicPage } from 'ionic-angular';
 import { NavController, Platform, LoadingController, ToastController } from 'ionic-angular';
 import { google } from 'google-maps';
@@ -18,9 +18,7 @@ import {
 } from '@ionic-native/google-maps';
 
 declare var google;
-const CAMERA_DEFAULT_LAT = 47.497912;
-const CAMERA_DEFAULT_LONG = 19.040235;
-const CAMERA_DEFAULT_ZOOMLEVEL = 8;
+
 
 
 @IonicPage()
@@ -38,9 +36,8 @@ export class HomePage implements OnInit {
   directionsService = new google.maps.DirectionsService;
   directionsDisplay = new google.maps.DirectionsRenderer;
   private points = new Array();
-  // private devLat;
-  // private devLng;
-  
+
+
   // points = [
   //   {lat: 85,lng: 90},  
   //   {lat: 85,lng: 0.1}, 
@@ -54,7 +51,7 @@ export class HomePage implements OnInit {
   //   {lat: -85,lng: 179.9},  
   //   {lat: 0,lng: 179.9},
   //   {lat: 85,lng: 179.9} ];
-    
+
 
 
   constructor(
@@ -70,33 +67,11 @@ export class HomePage implements OnInit {
     await this.initMap();
   }
   initMap() {
-// enableProdMode();
+    // enableProdMode();
     Environment.setEnv({
-      'API_KEY_FOR_BROWSER_RELEASE': 'AIzaSyBweCJqV46YsLWa-LtLUFfDcDmvsl8aFxs',
-      'API_KEY_FOR_BROWSER_DEBUG': 'AIzaSyBweCJqV46YsLWa-LtLUFfDcDmvsl8aFxs'
+
     });
     let mapOptions: GoogleMapOptions = {
-      // camera: {
-      //    target: {
-      //      lat: 43.0741904,
-      //      lng: -89.3809802
-      //    },
-      //    zoom: 10,
-      //    tilt: 0,
-      //  },
-      // disableDoubleClickZoom: true,
-      // draggable: false,
-      // scrollwheel: false,
-      // panControl: false,
-      // controls : {
-      //   compass : true,
-      //   myLocationButton : true,
-      //   myLocation: true,
-      //   indoorPicker : false,
-      //   zoom : false,
-      //   mapToolbar : false
-      // },
-
       mapType: "MAP_TYPE_NORMAL",
       controls: {
         compass: true,
@@ -112,10 +87,10 @@ export class HomePage implements OnInit {
       },
       camera: {
         target: {
-            lat: 47.2529,
-           lng: -122.4443
+          lat: 47.2529,
+          lng: -122.4443
         },
-        zoom: CAMERA_DEFAULT_ZOOMLEVEL
+        zoom: 8
       },
       preferences: {
         building: true
@@ -124,52 +99,95 @@ export class HomePage implements OnInit {
 
     this.map = GoogleMaps.create('map', mapOptions);
 
+    var POINT_ICON = {
+      path: "M-20,0a20,20 0 1,0 40,0a20,20 0 1,0 -40,0",
+      fillColor: '#FF0000',
+      fillOpacity: .6,
+      anchor: new google.maps.Point(0, 0),
+      strokeWeight: 0,
+      scale: .2
+    }
+
+
     this.map.on(GoogleMapsEvent.MAP_CLICK).subscribe(
       (data) => {
-          console.log("Click MAP on",data);
-          var myLatLng = {lat: data[0].lat, lng: data[0].lng};
-          this.points.push(myLatLng);
-          let marker: Marker = this.map.addMarkerSync({
-            title: '@ionic-native/google-maps plugin!',
-            snippet: 'This plugin is awesome!',
-            position: myLatLng,
-            animation: GoogleMapsAnimation.BOUNCE
-          });
-        
-          console.log("finding data lat", data[0].lat);
-          console.log("finding data lng", data[0].lng);
-       
+        console.log("Click MAP on", data);
+        var latlng = { lat: data[0].lat, lng: data[0].lng };
+        this.points.push(latlng);
+        let marker: Marker = this.map.addMarkerSync({
+          title: '@ionic-native/google-maps plugin!',
+          snippet: 'This plugin is awesome!',
+          position: latlng,
+          // animation: GoogleMapsAnimation.BOUNCE,
+
+        });
+
+        this.map.addPolyline({
+          points: this.points,
+          color: "orange",
+          width: 2
+        });
+
+
+
+
+        console.log("finding data lat", data[0].lat);
+        console.log("finding data lng", data[0].lng);
+
       }
     );
   }
 
-  addPolly(){
-            // Construct the polygon.
-            this.map.addPolygon({
-              'points': this.points,
-              'strokeColor': "blue",
-              // 'holes': this.drawCircle(loc,10,-1), //when adding this I lose the overlay and the hole is not drawn. When I remove it, it starts to work again but without a hole.
-              'strokeWidth': 4,
-              // 'fillColor': "#222222"
-            });
+  addPolly() {
+    this.map.clear();
+    // Construct the polygon.
+    this.map.addPolygon({
+      'points': this.points,
+      'strokeColor': "blue",
+      // 'holes': this.drawCircle(loc,10,-1), //when adding this I lose the overlay and the hole is not drawn. When I remove it, it starts to work again but without a hole.
+      'strokeWidth': 4,
+      'fillColor': "#222222"
+    });
+    this.points = new Array();
   }
 
-  clearMap(){
+  clearMap() {
     this.points = new Array();
     this.map.clear();
     // this.map.off();
     // this.map.of
   }
-  
 
-  addInfoWindow(marker, content){
- 
-  let infoWindow = new google.maps.InfoWindow({
-    content: content
-  });
- 
-  google.maps.event.addListener(marker, 'click', () => {
-    infoWindow.open(this.map, marker);
-  });
-}
+
+  addInfoWindow(marker, content) {
+
+    let infoWindow = new google.maps.InfoWindow({
+      content: content
+    });
+
+    google.maps.event.addListener(marker, 'click', () => {
+      infoWindow.open(this.map, marker);
+    });
+  }
+
+  track() {
+    //   public boolean contains(Point test) {
+    //     int i;
+    //     int j;
+    //     boolean result = false;
+    //     for (i = 0, j = points.length - 1; i < points.length; j = i++) {
+    //       if ((points[i].y > test.y) != (points[j].y > test.y) &&
+    //           (test.x < (points[j].x - points[i].x) * (test.y - points[i].y) / (points[j].y-points[i].y) + points[i].x)) {
+    //         result = !result;
+    //        }
+    //     }
+    //     return result;
+    //   }
+    // }
+  }
+
+
+  holdMap(){
+
+  }
 }
