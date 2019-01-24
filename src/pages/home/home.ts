@@ -16,7 +16,12 @@ import {
   GoogleMapsAnimation,
   GoogleMapOptions
 } from '@ionic-native/google-maps';
+
 declare var google;
+const CAMERA_DEFAULT_LAT = 47.497912;
+const CAMERA_DEFAULT_LONG = 19.040235;
+const CAMERA_DEFAULT_ZOOMLEVEL = 13;
+
 
 @IonicPage()
 @Component({
@@ -71,22 +76,58 @@ export class HomePage implements OnInit {
       'API_KEY_FOR_BROWSER_DEBUG': 'AIzaSyBweCJqV46YsLWa-LtLUFfDcDmvsl8aFxs'
     });
     let mapOptions: GoogleMapOptions = {
-      camera: {
-         target: {
-           lat: 47.241021404,
-           lng: -122.498184045
-         },
-         zoom: 8,
-         tilt: 0,
-       },
-      disableDoubleClickZoom: true,
-      draggable: false,
-      scrollwheel: false,
-      panControl: false,
+      // camera: {
+      //    target: {
+      //      lat: 43.0741904,
+      //      lng: -89.3809802
+      //    },
+      //    zoom: 10,
+      //    tilt: 0,
+      //  },
+      // disableDoubleClickZoom: true,
+      // draggable: false,
+      // scrollwheel: false,
+      // panControl: false,
+      // controls : {
+      //   compass : true,
+      //   myLocationButton : true,
+      //   myLocation: true,
+      //   indoorPicker : false,
+      //   zoom : false,
+      //   mapToolbar : false
+      // },
+
+      mapType: "MAP_TYPE_NORMAL",
       controls: {
-        myLocationButton: true
+        compass: true,
+        myLocation: true,
+        myLocationButton: true,
+        zoom: true
+      },
+      gestures: {
+        scroll: false,
+        tilt: false,
+        rotate: false,
+        zoom: true
+      },
+      camera: {
+        target: {
+            lat: 47.0741904,
+           lng: -89.3809802
+        },
+        zoom: CAMERA_DEFAULT_ZOOMLEVEL
+      },
+      preferences: {
+        // zoom: {
+        //   minZoom: 10,
+        //   maxZoom: 18
+        // },
+        building: true
       }
     };
+
+
+
 
     this.map = GoogleMaps.create('map', mapOptions);
 
