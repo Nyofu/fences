@@ -5,7 +5,7 @@ import { NavController, Platform, LoadingController, ToastController } from 'ion
 import { google } from 'google-maps';
 // import { Geolocation ,GeolocationOptions ,Geoposition ,PositionError } from '@ionic-native/geolocation;
 // import { Geolocation } from '@ionic-native/geolocation/';
-// import { Geolocation } from 'ionic-native';
+import { Geolocation } from 'ionic-native';
 import {
   GoogleMaps,
   GoogleMap,
@@ -68,9 +68,7 @@ export class HomePage implements OnInit {
   }
   initMap() {
     // enableProdMode();
-    Environment.setEnv({
 
-    });
     let mapOptions: GoogleMapOptions = {
       mapType: "MAP_TYPE_NORMAL",
       controls: {
@@ -128,9 +126,6 @@ export class HomePage implements OnInit {
           width: 2
         });
 
-
-
-
         console.log("finding data lat", data[0].lat);
         console.log("finding data lng", data[0].lng);
 
@@ -148,7 +143,25 @@ export class HomePage implements OnInit {
       'strokeWidth': 4,
       'fillColor': "#222222"
     });
-    this.points = new Array();
+    // this.points = new Array();
+    // 
+   let inPoly = this.track();
+   console.log("in Poly:", inPoly);
+
+   if(inPoly){
+    var mylatlng = { lat: 47.22863421095808, lng: -122.50879230247466 };
+
+    let marker: Marker = this.map.addMarkerSync({
+      title: '@ionic-native/google-maps plugin!',
+      snippet: 'This plugin is awesome!',
+      position: mylatlng,
+      animation: GoogleMapsAnimation.BOUNCE,
+      icon: "black"
+
+
+    });
+
+   }
   }
 
   clearMap() {
@@ -176,18 +189,42 @@ export class HomePage implements OnInit {
     //     int j;
     //     boolean result = false;
     //     for (i = 0, j = points.length - 1; i < points.length; j = i++) {
-    //       if ((points[i].y > test.y) != (points[j].y > test.y) &&
-    //           (test.x < (points[j].x - points[i].x) * (test.y - points[i].y) / (points[j].y-points[i].y) + points[i].x)) {
+
+    //       if ((points[i].y > test.y) != (points[j].y > test.y) &&  (test.x < (points[j].x - points[i].x) * (test.y - points[i].y) / (points[j].y-points[i].y) + points[i].x)) {
     //         result = !result;
     //        }
     //     }
     //     return result;
     //   }
     // }
+
+
+
+    var x = 47.22863421095808;
+    var y = -122.50879230247466;
+
+    var inside = false;
+    console.log("in track:", this.points.length);
+    console.log("in track :",this.points[0].lat);
+    for (var i = 0, j = this.points.length - 1; i < this.points.length; j = i++) {
+        var xi = this.points[i].lat;
+        var yi = this.points[i].lng;
+
+        var xj = this.points[j].lat; 
+        var yj = this.points[j].lng;
+
+        var intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        console.log("intersect:", intersect);
+        if (intersect) inside = !inside;
+    }
+
+    return inside;
+
+
   }
 
 
   holdMap(){
-
+    
   }
 }
