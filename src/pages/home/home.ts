@@ -3,9 +3,11 @@ import { enableProdMode } from '@angular/core';
 import { IonicPage } from 'ionic-angular';
 import { NavController, Platform, LoadingController, ToastController } from 'ionic-angular';
 import { google } from 'google-maps';
-// import { Geolocation ,GeolocationOptions ,Geoposition ,PositionError } from '@ionic-native/geolocation;
-// import { Geolocation } from '@ionic-native/geolocation/';
-import { Geolocation } from 'ionic-native';
+// import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { Geolocation } from '@ionic-native/geolocation';
+import { NativeGeocoder } from '@ionic-native/native-geocoder/ngx';
+import { Vibration } from '@ionic-native/vibration/ngx';
+
 import {
   GoogleMaps,
   GoogleMap,
@@ -19,7 +21,13 @@ import {
 
 declare var google;
 
-
+const point = {
+  url: './assets/marker/point.png',
+  size: {
+    width: 24,
+    height: 24
+  }
+};
 
 @IonicPage()
 @Component({
@@ -36,6 +44,12 @@ export class HomePage implements OnInit {
   directionsService = new google.maps.DirectionsService;
   directionsDisplay = new google.maps.DirectionsRenderer;
   private points = new Array();
+  inPoly : boolean = false;
+  isTracking : boolean = false;
+
+
+  geoData: String = "Starting";
+
 
 
   // points = [
@@ -57,7 +71,9 @@ export class HomePage implements OnInit {
   constructor(
     public loadingCtrl: LoadingController,
     public toastCtrl: ToastController,
-    private platform: Platform
+    private platform: Platform,
+    private geolocation: Geolocation,
+    private vibration: Vibration
   ) { }
 
   async ngOnInit() {
@@ -68,7 +84,10 @@ export class HomePage implements OnInit {
   }
   initMap() {
     // enableProdMode();
-
+    Environment.setEnv({
+      'API_KEY_FOR_BROWSER_RELEASE': 'AIzaSyBweCJqV46YsLWa-LtLUFfDcDmvsl8aFxs',
+      'API_KEY_FOR_BROWSER_DEBUG': 'AIzaSyBweCJqV46YsLWa-LtLUFfDcDmvsl8aFxs'
+    });
     let mapOptions: GoogleMapOptions = {
       mapType: "MAP_TYPE_NORMAL",
       controls: {
@@ -116,7 +135,10 @@ export class HomePage implements OnInit {
           title: '@ionic-native/google-maps plugin!',
           snippet: 'This plugin is awesome!',
           position: latlng,
-          // animation: GoogleMapsAnimation.BOUNCE,
+          icon: {  url: "assets/marker/point.png",
+              size: { width: 8, height: 8 } 
+            }
+                    // animation: GoogleMapsAnimation.BOUNCE,
 
         });
 
@@ -125,10 +147,6 @@ export class HomePage implements OnInit {
           color: "orange",
           width: 2
         });
-
-        console.log("finding data lat", data[0].lat);
-        console.log("finding data lng", data[0].lng);
-
       }
     );
   }
@@ -140,33 +158,15 @@ export class HomePage implements OnInit {
       'points': this.points,
       'strokeColor': "blue",
       // 'holes': this.drawCircle(loc,10,-1), //when adding this I lose the overlay and the hole is not drawn. When I remove it, it starts to work again but without a hole.
-      'strokeWidth': 4,
+      'strokeWidth': 3,
       'fillColor': "#222222"
     });
-    // this.points = new Array();
-    // 
-   let inPoly = this.track();
-   console.log("in Poly:", inPoly);
-
-   if(inPoly){
-    var mylatlng = { lat: 47.22863421095808, lng: -122.50879230247466 };
-
-    let marker: Marker = this.map.addMarkerSync({
-      title: '@ionic-native/google-maps plugin!',
-      snippet: 'This plugin is awesome!',
-      position: mylatlng,
-      animation: GoogleMapsAnimation.BOUNCE,
-      icon: "black"
-
-
-    });
-
-   }
   }
 
   clearMap() {
     this.points = new Array();
     this.map.clear();
+
     // this.map.off();
     // this.map.of
   }
@@ -184,47 +184,40 @@ export class HomePage implements OnInit {
   }
 
   track() {
-    //   public boolean contains(Point test) {
-    //     int i;
-    //     int j;
-    //     boolean result = false;
-    //     for (i = 0, j = points.length - 1; i < points.length; j = i++) {
+    console.log("Is Tracking", this.isTracking);
+    this.isTracking = true;
+    console.log("Is Tracking", this.isTracking);
 
-    //       if ((points[i].y > test.y) != (points[j].y > test.y) &&  (test.x < (points[j].x - points[i].x) * (test.y - points[i].y) / (points[j].y-points[i].y) + points[i].x)) {
-    //         result = !result;
-    //        }
-    //     }
-    //     return result;
-    //   }
-    // }
+    var x; //= 47.22863421095808;
+    var y; //= -122.50879230247466;
 
+    let GPSoptions = { timeout: 10000, enableHighAccuracy: true, maximumAge: 3600 };
+    let watch = this.geolocation.watchPosition(GPSoptions);
 
+    watch.subscribe((data) => {
+      x = data.coords.latitude;
+      y = data.coords.longitude
+      // console.log(data.coords.latitude +", " + data.coords.longitude);
+      this.geoData = "lat: " + x + " | lng: " + y + "<br>";
+      this.inPoly = false;
+      console.log("in track poly size:", this.points.length);
 
-    var x = 47.22863421095808;
-    var y = -122.50879230247466;
-
-    var inside = false;
-    console.log("in track:", this.points.length);
-    console.log("in track :",this.points[0].lat);
-    for (var i = 0, j = this.points.length - 1; i < this.points.length; j = i++) {
+      console.log("x|lat :" + x + "y|lng :" + y);
+      for (var i = 0, j = this.points.length - 1; i < this.points.length; j = i++) {
         var xi = this.points[i].lat;
         var yi = this.points[i].lng;
 
-        var xj = this.points[j].lat; 
+        var xj = this.points[j].lat;
         var yj = this.points[j].lng;
 
         var intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
         console.log("intersect:", intersect);
-        if (intersect) inside = !inside;
-    }
+        if (intersect){
+          this.vibration.vibrate([2000,1000,2000]);
+          this.inPoly = !this.inPoly;
+        }
+      }
 
-    return inside;
-
-
-  }
-
-
-  holdMap(){
-    
+    });
   }
 }

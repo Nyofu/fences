@@ -13,6 +13,12 @@ page-home {
       padding-left: 10px;
     }
     #map {
-      height: 100%;
+      height: 85%;
+    }
+    #data{
+      height: 8%;
+    }
+    .item-checkbox-right {
+      flex-direction: row-reverse;
     }
   }
