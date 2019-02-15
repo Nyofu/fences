@@ -44,8 +44,10 @@ export class HomePage implements OnInit {
   directionsService = new google.maps.DirectionsService;
   directionsDisplay = new google.maps.DirectionsRenderer;
   private points = new Array();
-  inPoly : boolean = false;
-  isTracking : boolean = false;
+  inPoly: boolean = false;
+  isTracking: boolean = false;
+  canTrack: boolean = false;
+  hasPoly: boolean = false;
 
 
   geoData: String = "Starting";
@@ -85,8 +87,7 @@ export class HomePage implements OnInit {
   initMap() {
     // enableProdMode();
     Environment.setEnv({
-      'API_KEY_FOR_BROWSER_RELEASE': 'AIzaSyBweCJqV46YsLWa-LtLUFfDcDmvsl8aFxs',
-      'API_KEY_FOR_BROWSER_DEBUG': 'AIzaSyBweCJqV46YsLWa-LtLUFfDcDmvsl8aFxs'
+
     });
     let mapOptions: GoogleMapOptions = {
       mapType: "MAP_TYPE_NORMAL",
@@ -128,32 +129,49 @@ export class HomePage implements OnInit {
 
     this.map.on(GoogleMapsEvent.MAP_CLICK).subscribe(
       (data) => {
-        console.log("Click MAP on", data);
-        var latlng = { lat: data[0].lat, lng: data[0].lng };
-        this.points.push(latlng);
-        let marker: Marker = this.map.addMarkerSync({
-          title: '@ionic-native/google-maps plugin!',
-          snippet: 'This plugin is awesome!',
-          position: latlng,
-          icon: {  url: "assets/marker/point.png",
-              size: { width: 8, height: 8 } 
+
+        if (!this.isTracking) {
+          console.log("Click MAP on", data);
+          var latlng = { lat: data[0].lat, lng: data[0].lng };
+          this.points.push(latlng);
+
+          let marker: Marker = this.map.addMarkerSync({
+            title: '@ionic-native/google-maps plugin!',
+            snippet: 'This plugin is awesome!',
+            position: latlng,
+            icon: {
+              url: "assets/marker/point.png",
+              size: { width: 8, height: 8 }
             }
-                    // animation: GoogleMapsAnimation.BOUNCE,
+            // animation: GoogleMapsAnimation.BOUNCE,
 
-        });
+          });
 
-        this.map.addPolyline({
-          points: this.points,
-          color: "orange",
-          width: 2
-        });
+          this.map.addPolyline({
+            points: this.points,
+            color: "orange",
+            width: 2
+          });
+
+        }
       }
     );
+
   }
 
   addPolly() {
     this.map.clear();
     // Construct the polygon.
+    // window.addEventListener('canTrack', (e) => {
+    console.log('point list size', this.points.length);
+    if (this.points.length < 3) {
+      this.canTrack = false;
+      return;
+    }
+    else {
+      this.canTrack = true;
+    }
+    // }, false);
     this.map.addPolygon({
       'points': this.points,
       'strokeColor': "blue",
@@ -161,19 +179,22 @@ export class HomePage implements OnInit {
       'strokeWidth': 3,
       'fillColor': "#222222"
     });
+
+    this.hasPoly = true;
   }
 
   clearMap() {
     this.points = new Array();
     this.map.clear();
+    this.canTrack = false;
+    this.inPoly = false;
+    this.isTracking = false;
+    this.hasPoly = false;
 
-    // this.map.off();
-    // this.map.of
   }
 
 
   addInfoWindow(marker, content) {
-
     let infoWindow = new google.maps.InfoWindow({
       content: content
     });
@@ -184,14 +205,16 @@ export class HomePage implements OnInit {
   }
 
   track() {
-    console.log("Is Tracking", this.isTracking);
-    this.isTracking = true;
+    window.addEventListener('isTracking', (e) => {
+      console.log('switched to offline mode');
+      this.isTracking = !this.isTracking;
+    }, false);
     console.log("Is Tracking", this.isTracking);
 
     var x; //= 47.22863421095808;
     var y; //= -122.50879230247466;
 
-    let GPSoptions = { timeout: 10000, enableHighAccuracy: true, maximumAge: 3600 };
+    let GPSoptions = { enableHighAccuracy: true };
     let watch = this.geolocation.watchPosition(GPSoptions);
 
     watch.subscribe((data) => {
@@ -211,13 +234,15 @@ export class HomePage implements OnInit {
         var yj = this.points[j].lng;
 
         var intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-        console.log("intersect:", intersect);
-        if (intersect){
-          this.vibration.vibrate([2000,1000,2000]);
+        console.log("inPoly:", this.inPoly);
+        if (intersect) {
           this.inPoly = !this.inPoly;
+          window.addEventListener('withinPoly', (e) => {
+            console.log('in poly');
+            this.inPoly;
+          }, false);
         }
       }
-
     });
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "fences",
-  "version": "0.1.0",
+  "version": "0.2.2",
   "author": "Ionic Framework",
   "homepage": "http://ionicframework.com/",
   "private": true,
@@ -51,6 +51,7 @@
     "rxjs": "5.5.11",
     "rxjs-compat": "^6.3.3",
     "sw-toolbox": "3.6.0",
+    "web-animations-js": "^2.3.1",
     "zone.js": "0.8.26"
   },
   "devDependencies": {

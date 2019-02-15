@@ -5,6 +5,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Vibration } from '@ionic-native/vibration/ngx';
+import { CommonModule } from '@angular/common';
 // import { NativeGeocoder } from '@ionic-native/native-geocoder/ngx';
 
 import { MyApp } from './app.component';
@@ -15,6 +16,7 @@ import { MyApp } from './app.component';
   ],
   imports: [
     BrowserModule,
+    CommonModule,
     IonicModule.forRoot(MyApp)
   ],
   bootstrap: [IonicApp],

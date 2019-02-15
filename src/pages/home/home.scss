@@ -21,4 +21,21 @@ page-home {
     .item-checkbox-right {
       flex-direction: row-reverse;
     }
+
+    .inMyPolly{
+      background: green;
+      text-align: center;
+      padding: .2rem;
+    }
+
+    .outMyPoly{
+      background: red;
+      text-align: center;
+      padding: .2rem;
+    }
+    .instruction{
+      background: yellow;
+      text-align: center;
+      padding: .2rem;
+    }
   }
